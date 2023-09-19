@@ -11,39 +11,44 @@ public class AccountService {
     static  {
         accounts[0] = new Account("Ken", "ken123@gmail.com", "123456");
      }
-    public boolean login(String userName, String password) {
-        for (Account acc: accounts) {
-            if(acc != null && acc.getUserName().equals(userName) && acc.getPassword().equals(password)) {
-                return true;
+    public Account login(String username, String password){
+        for (Account acc:accounts
+             ) {
+            if (acc!=null && acc.getUserName().equalsIgnoreCase(username)&&
+                    acc.getPassword().equalsIgnoreCase(password)){
+                return acc;
             }
         }
-        return false;
+        return null;
     }
-
-    public boolean checkExist(String userName){
-
-        for (Account acc: accounts) {
-            if(acc != null && acc.getUserName().equals(userName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    public boolean checkEmail(String email){
-        String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-        return Pattern.matches(regex, email);
-    }
-    public boolean addUser(Account acc) {
+    public boolean register(Account account){
+        // đã xác thực dữ liệu
         for (int i = 0; i < accounts.length; i++) {
-            if(accounts[i] == null) {
-                accounts[i] = acc;
+            if(accounts[i]==null){
+                accounts[i] = account;
+                break;
+            }
+        }
+        return true;
+    }
+
+    public boolean existByUserName (String username){
+        for (Account acc:accounts
+        ) {
+            if (acc!=null && acc.getUserName().equalsIgnoreCase(username)){
                 return true;
             }
         }
         return false;
     }
-    public void register() {
-
+    public boolean existByEmail (String email){
+        for (Account acc:accounts
+        ) {
+            if (acc!=null && acc.getEmail().equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        return false;
     }
+
 }

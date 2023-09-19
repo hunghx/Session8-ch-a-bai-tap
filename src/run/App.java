@@ -7,13 +7,14 @@ import util.InputMethods;
 public class App {
     private static AccountService accountService = new AccountService();
     public static void main(String[] args) {
-        int check = 0;
         while (true){
-            System.out.println("============ **** MENU **** ============");
-            System.out.println("1.Login\n" + "2.Register\n" + "3.Exit");
-            System.out.println("Nhap lua chon cua ban : ");
-            check = InputMethods.getInteger();
-            switch (check) {
+            System.out.println("===============Menu===============");
+            System.out.println("1.             Login");
+            System.out.println("2.            Register");
+            System.out.println("3.             Exit");
+            System.out.println("Nhập lựa chọn");
+            byte choice = InputMethods.getByte();
+            switch (choice){
                 case 1:
                     login();
                     break;
@@ -22,89 +23,82 @@ public class App {
                     break;
                 case 3:
                     System.exit(0);
-                    break;
+                default:
+                    System.err.println("Không đúng giá trị");
             }
         }
+
+
     }
 
     public static void login() {
-        System.out.println("======= *** LOGIN *** ======");
-        while (true){
-            boolean flag = true;
-            System.out.println("UserName : ");
-            String userName = InputMethods.getString();
-            System.out.println("Password : ");
-            String password = InputMethods.getString();
-            if(accountService.login(userName, password)) {
-                System.out.println("=====> Login success! ****");
-                while (true) {
-                    System.out.println("Ban co muon Logout khong ? y/n ");
-                    char check = InputMethods.getString().charAt(0);
-                    if(check == 'y'){
-                        flag = false;
-                        break;
-                    }
-                }
+            // hiển thị form đăng nhập
+        System.out.println("==========LOGIN==============");
+        System.out.println("Nhập username :");
+        String username = InputMethods.getString();
+        System.out.println();
+        System.out.println("Nhập password :");
+        String password=InputMethods.getString();
+        Account acc = accountService.login(username,password);
+       if(acc==null){
+           System.err.println("Sai tên đăng nhập hoặc mật khẩu");
+           System.out.println("Bạn muốn tiếp tục đăng nhập ?");
+           System.out.println("1. login");
+           System.out.println("other. register");
+           byte choose = InputMethods.getByte();
+           if(choose==1){
+               login();
+           }else {
+               register();
+           }
+       }else {
+           // đăng nhập thành công
+           System.out.println("CHào mừng bạn "+acc.getUserName()+" đến trang chủ");
+           System.out.println("Nhấn phím bất kì để thoát");
+           InputMethods.pressAnyKey();
 
-            } else {
-                System.out.println("Username hoac Password chua dung, vui long nhap lai!");
-            }
-            if(flag) {
-                continue;
-            } else {
-                break;
-            }
-
-        }
-
+       }
     }
     public static void register() {
-        System.out.println("===== *** REGISTER *** =====");
-        Account account = new Account();
-        while (true) {
-            System.out.println("UserName : ");
-            String userName = InputMethods.getString();
-            if(accountService.checkExist(userName)){
-                System.out.println("UserName da ton tai vui long nhap UserName khac");
-            } else {
-                account.setUserName(userName);
+        System.out.println("==============REGISTER=============");
+        Account account =new Account();
+        while (true){
+            System.out.println("Nhập username :");
+            String username = InputMethods.getString();
+            if (accountService.existByUserName(username)){
+                System.err.println("Tên đăng nhập đã tồn tại");
+            }else {
+                account.setUserName(username);
                 break;
             }
         }
+
         while (true) {
-            System.out.println("Email : ");
+            System.out.print("Nhập email :");
             String email = InputMethods.getString();
-            if(accountService.checkEmail(email)){
+            if (accountService.existByEmail(email)){
+                System.err.println("email đã tồn tại");
+            }else {
                 account.setEmail(email);
                 break;
-            } else {
-                System.out.println("Email chua hop le, vui long nhap lai");
             }
         }
-        while (true) {
-            System.out.println("Password : ");
-            String password = InputMethods.getString();
-            if(password.length() < 6){
-                System.out.println("Password can it nhat 6 ky tu!");
+        System.out.print("Nhập password :");
+        String pass = InputMethods.getString();
+        while (true){
+            System.out.print("Xác nhận mật khẩu :");
+            String rePass = InputMethods.getString();
+            if(pass.equals(rePass)){
+                account.setPassword(pass);
+                break;
+            }
+            System.err.println("mât khẩu không trùng khớp");
+        }
 
-            } else {
-                account.setPassword(password);
-                break;
-            }
-        }
-        while (true) {
-            System.out.println("Password Confirm : ");
-            String confirmPassword = InputMethods.getString();
-            if(confirmPassword.equals(account.getPassword())){
-                break;
-            } else {
-                System.out.println("Password Confirm chua chinh xac, vui long nhap lai!");
-            }
-        }
-        if(accountService.addUser(account)) {
-            System.out.println("Register success!");
-        }
+        accountService.register(account);
+        System.out.println("Đăng kí thành công");
         login();
+
     }
 
 }
